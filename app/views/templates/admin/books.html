@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Books - Admin{% endblock %}
+{% block page_id %}admin-books{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 px-lg-5">
+    <div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div>
+            <h1>Book Management</h1>
+            <p class="text-muted mb-0">Add, edit, remove books, authors, and categories.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                <i class="bi bi-tag me-1"></i> Add Category
+            </button>
+            <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#addAuthorModal">
+                <i class="bi bi-person-plus me-1"></i> Add Author
+            </button>
+            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addBookModal">
+                <i class="bi bi-plus-lg me-1"></i> Add New Book
+            </button>
+        </div>
+    </div>
+
+    <div id="book-alert"></div>
+
+    <!-- Books Table -->
+    <div class="card">
+        <div class="card-header bg-white py-3">
+            <h5 class="card-title mb-0">All Cataloged Books</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>ISBN</th>
+                        <th>Category</th>
+                        <th>Copies (Avail/Total)</th>
+                        <th>Status</th>
+                        <th style="width: 150px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="books-tbody">
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-3">Loading catalog books...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== ADD BOOK MODAL ==================== -->
+<div class="modal fade" id="addBookModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Book</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="add-book-form">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label" for="book-title">Book Title *</label>
+                            <input type="text" class="form-control" id="book-title" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="book-isbn">ISBN *</label>
+                            <input type="text" class="form-control" id="book-isbn" placeholder="e.g. 9780132350884" required>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label mb-0" for="book-author">Author *</label>
+                                <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" onclick="toggleAuthorInput('add')">
+                                    <span id="author-toggle-text-add">+ Type New Author</span>
+                                </button>
+                            </div>
+                            <div id="author-select-group-add">
+                                <select class="form-select author-select" id="book-author">
+                                    <option value="">Select Author</option>
+                                    <option value="__new__">+ Type New Author...</option>
+                                </select>
+                            </div>
+                            <div id="author-input-group-add" style="display: none;">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="new-author-name" placeholder="Type new author name...">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="toggleAuthorInput('add', false)" title="Back to dropdown">
+                                        <i class="bi bi-arrow-left"></i>
+                                    </button>
+                                </div>
+                                <div class="form-text">Will be created automatically.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label mb-0" for="book-category">Category *</label>
+                                <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" onclick="toggleCategoryInput('add')">
+                                    <span id="category-toggle-text-add">+ Type New Category</span>
+                                </button>
+                            </div>
+                            <div id="category-select-group-add">
+                                <select class="form-select category-select" id="book-category">
+                                    <option value="">Select Category</option>
+                                    <option value="__new__">+ Type New Category...</option>
+                                </select>
+                            </div>
+                            <div id="category-input-group-add" style="display: none;">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="new-category-name" placeholder="Type new category name...">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="toggleCategoryInput('add', false)" title="Back to dropdown">
+                                        <i class="bi bi-arrow-left"></i>
+                                    </button>
+                                </div>
+                                <div class="form-text">Will be created automatically.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="book-publisher">Publisher</label>
+                            <input type="text" class="form-control" id="book-publisher">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="book-year">Published Year</label>
+                            <input type="number" class="form-control" id="book-year" min="1500" max="2099">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="book-copies">Total Copies *</label>
+                            <input type="number" class="form-control" id="book-copies" value="1" min="1" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="book-description">Description</label>
+                            <textarea class="form-control" id="book-description" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Book</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== EDIT BOOK MODAL ==================== -->
+<div class="modal fade" id="editBookModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Book</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="edit-book-form">
+                <div class="modal-body">
+                    <input type="hidden" id="edit-book-id">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label" for="edit-book-title">Book Title *</label>
+                            <input type="text" class="form-control" id="edit-book-title" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="edit-book-isbn">ISBN *</label>
+                            <input type="text" class="form-control" id="edit-book-isbn" required>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label mb-0" for="edit-book-author">Author *</label>
+                                <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" onclick="toggleAuthorInput('edit')">
+                                    <span id="author-toggle-text-edit">+ Type New Author</span>
+                                </button>
+                            </div>
+                            <div id="author-select-group-edit">
+                                <select class="form-select author-select" id="edit-book-author">
+                                    <option value="">Select Author</option>
+                                    <option value="__new__">+ Type New Author...</option>
+                                </select>
+                            </div>
+                            <div id="author-input-group-edit" style="display: none;">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="edit-new-author-name" placeholder="Type new author name...">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="toggleAuthorInput('edit', false)" title="Back to dropdown">
+                                        <i class="bi bi-arrow-left"></i>
+                                    </button>
+                                </div>
+                                <div class="form-text">Will be created automatically.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label mb-0" for="edit-book-category">Category *</label>
+                                <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" onclick="toggleCategoryInput('edit')">
+                                    <span id="category-toggle-text-edit">+ Type New Category</span>
+                                </button>
+                            </div>
+                            <div id="category-select-group-edit">
+                                <select class="form-select category-select" id="edit-book-category">
+                                    <option value="">Select Category</option>
+                                    <option value="__new__">+ Type New Category...</option>
+                                </select>
+                            </div>
+                            <div id="category-input-group-edit" style="display: none;">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="edit-new-category-name" placeholder="Type new category name...">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="toggleCategoryInput('edit', false)" title="Back to dropdown">
+                                        <i class="bi bi-arrow-left"></i>
+                                    </button>
+                                </div>
+                                <div class="form-text">Will be created automatically.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="edit-book-publisher">Publisher</label>
+                            <input type="text" class="form-control" id="edit-book-publisher">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label" for="edit-book-year">Year</label>
+                            <input type="number" class="form-control" id="edit-book-year">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label" for="edit-book-copies">Total Copies *</label>
+                            <input type="number" class="form-control" id="edit-book-copies" min="0" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label" for="edit-book-available">Available *</label>
+                            <input type="number" class="form-control" id="edit-book-available" min="0" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="edit-book-description">Description</label>
+                            <textarea class="form-control" id="edit-book-description" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Book</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== ADD AUTHOR MODAL ==================== -->
+<div class="modal fade" id="addAuthorModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Author</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="add-author-form">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label" for="author-name">Author Name *</label>
+                        <input type="text" class="form-control" id="author-name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="author-bio">Biography</label>
+                        <textarea class="form-control" id="author-bio" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Author</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== ADD CATEGORY MODAL ==================== -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="add-category-form">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label" for="category-name">Category Name *</label>
+                        <input type="text" class="form-control" id="category-name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="category-description">Description</label>
+                        <textarea class="form-control" id="category-description" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/admin.js"></script>
+{% endblock %}

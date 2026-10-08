@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Borrowing Records - Admin{% endblock %}
+{% block page_id %}admin-borrowings{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 px-lg-5">
+    <div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div>
+            <h1>Circulation & Borrowing Records</h1>
+            <p class="text-muted mb-0">Track all issued loans, returned books, and check overdue records.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <label for="status-filter" class="form-label mb-0 small text-muted">Filter by Status:</label>
+            <select class="form-select form-select-sm" id="status-filter" style="width: 160px;">
+                <option value="">All Statuses</option>
+                <option value="borrowed">Currently Borrowed</option>
+                <option value="returned">Returned</option>
+            </select>
+            <a href="/admin" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i> Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-white py-3">
+            <h5 class="card-title mb-0">Borrowing Ledger</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Patron Name</th>
+                        <th>Book Title</th>
+                        <th>Borrow Date</th>
+                        <th>Due Date</th>
+                        <th>Return Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="borrowings-tbody">
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-3">Loading circulation records...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/admin.js"></script>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Library Management System{% endblock %}
+{% block page_id %}register{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="card">
+        <h2>Create Account</h2>
+        <div id="alert-container"></div>
+        <form id="register-form">
+            <div class="mb-3">
+                <label for="full-name" class="form-label">Full Name *</label>
+                <input type="text" class="form-control" id="full-name" placeholder="John Doe" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email Address *</label>
+                <input type="email" class="form-control" id="email" placeholder="you@example.com" required>
+            </div>
+            <div class="mb-3">
+                <label for="phone" class="form-label">Phone Number</label>
+                <input type="tel" class="form-control" id="phone" placeholder="9876543210">
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password *</label>
+                <input type="password" class="form-control" id="password" placeholder="At least 6 characters" required>
+            </div>
+            <div class="mb-3">
+                <label for="confirm-password" class="form-label">Confirm Password *</label>
+                <input type="password" class="form-control" id="confirm-password" placeholder="Re-enter password" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Create Account</button>
+        </form>
+        <p class="text-center mt-3 mb-0" style="font-size: 0.9rem;">
+            Already have an account? <a href="/login">Sign in</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/auth.js"></script>
+{% endblock %}

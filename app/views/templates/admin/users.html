@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Users - Admin{% endblock %}
+{% block page_id %}admin-users{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 px-lg-5">
+    <div class="page-header d-flex justify-content-between align-items-center">
+        <div>
+            <h1>Registered Users</h1>
+            <p class="text-muted mb-0">View all registered patrons, students, and administrators.</p>
+        </div>
+        <a href="/admin" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Dashboard
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-white py-3">
+            <h5 class="card-title mb-0">User Directory</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Full Name</th>
+                        <th>Email Address</th>
+                        <th>Phone</th>
+                        <th>Role</th>
+                        <th>Registration Date</th>
+                    </tr>
+                </thead>
+                <tbody id="users-tbody">
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-3">Loading users directory...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/admin.js"></script>
+{% endblock %}

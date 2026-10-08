@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Library Management System{% endblock %}
+{% block page_id %}admin-dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 px-lg-5">
+    <div class="page-header d-flex justify-content-between align-items-center">
+        <div>
+            <h1>Admin Panel</h1>
+            <p class="text-muted mb-0">System overview and management console.</p>
+        </div>
+        <div class="btn-group">
+            <a href="/admin/books" class="btn btn-outline-primary btn-sm"><i class="bi bi-book me-1"></i> Books</a>
+            <a href="/admin/users" class="btn btn-outline-primary btn-sm"><i class="bi bi-people me-1"></i> Users</a>
+            <a href="/admin/borrowings" class="btn btn-outline-primary btn-sm"><i class="bi bi-journal-check me-1"></i> Borrowings</a>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card stat-card">
+                <div class="stat-number" id="stat-books">0</div>
+                <div class="stat-label">Total Books in Catalog</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card" style="border-left-color: var(--secondary);">
+                <div class="stat-number" id="stat-users" style="color: var(--secondary);">0</div>
+                <div class="stat-label">Registered Members</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card" style="border-left-color: var(--accent);">
+                <div class="stat-number" id="stat-borrowings" style="color: var(--accent);">0</div>
+                <div class="stat-label">Total Loans Issued</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Navigation Actions -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card p-3 h-100">
+                <h6 class="fw-bold mb-2"><i class="bi bi-journal-plus text-primary me-2"></i>Book Inventory</h6>
+                <p class="text-muted small mb-3">Add new titles, update existing stock, adjust availability, or remove books.</p>
+                <a href="/admin/books" class="btn btn-sm btn-primary mt-auto">Manage Books &rarr;</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-3 h-100">
+                <h6 class="fw-bold mb-2"><i class="bi bi-people text-secondary me-2"></i>Member Management</h6>
+                <p class="text-muted small mb-3">View registered students and staff members with contact info and roles.</p>
+                <a href="/admin/users" class="btn btn-sm btn-outline-secondary mt-auto">View Users &rarr;</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-3 h-100">
+                <h6 class="fw-bold mb-2"><i class="bi bi-card-checklist text-warning me-2"></i>Circulation Records</h6>
+                <p class="text-muted small mb-3">Monitor all active loans, return statuses, and track overdue items.</p>
+                <a href="/admin/borrowings" class="btn btn-sm btn-outline-dark mt-auto">View Records &rarr;</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Borrowings Table -->
+    <div class="card">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Recent Circulation Activity</h5>
+            <a href="/admin/borrowings" class="btn btn-sm btn-link text-decoration-none">View All Records &rarr;</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Book Title</th>
+                        <th>Borrow Date</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="recent-borrowings">
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-3">Loading circulation data...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/admin.js"></script>
+{% endblock %}

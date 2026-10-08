@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Books - Library Management System{% endblock %}
+{% block page_id %}books{% endblock %}
+{% block meta_description %}Browse and search our library collection. Filter by category, author, or availability.{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="page-header">
+        <h1>Browse Books</h1>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="search-bar">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label for="search-input" class="form-label">Search</label>
+                <input type="text" class="form-control" id="search-input" placeholder="Search by title, ISBN...">
+            </div>
+            <div class="col-md-3">
+                <label for="category-filter" class="form-label">Category</label>
+                <select class="form-select" id="category-filter">
+                    <option value="">All Categories</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="author-filter" class="form-label">Author</label>
+                <select class="form-select" id="author-filter">
+                    <option value="">All Authors</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <div class="form-check mt-2">
+                    <input class="form-check-input" type="checkbox" id="available-filter">
+                    <label class="form-check-label" for="available-filter">Available only</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Books Grid -->
+    <div id="books-container">
+        <div class="loading-spinner">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <div id="pagination" class="mt-4"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/books.js"></script>
+{% endblock %}

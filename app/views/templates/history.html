@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Borrowing History - Library Management System{% endblock %}
+{% block page_id %}history{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="page-header d-flex justify-content-between align-items-center">
+        <div>
+            <h1>Borrowing History</h1>
+            <p class="text-muted mb-0">Record of all books you have borrowed and returned.</p>
+        </div>
+        <a href="/books" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-plus-lg me-1"></i> Borrow More Books
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Book Title</th>
+                        <th>Borrow Date</th>
+                        <th>Due Date</th>
+                        <th>Return Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="history-tbody">
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-3">Loading history...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/dashboard.js"></script>
+{% endblock %}
