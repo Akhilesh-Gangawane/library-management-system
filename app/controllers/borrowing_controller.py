@@ -120,10 +120,12 @@ def return_book(db: Session, user_id: int, borrowing_id: int) -> dict:
 
 def get_user_borrowings(db: Session, user_id: int, page: int = 1, per_page: int = 10) -> dict:
     """
-    Retrieve the borrowing history for a specific user.
+    Retrieve the borrowing history for a specific user using ORM joins.
     """
     query = (
         db.query(Borrowing)
+        .join(Borrowing.book)
+        .outerjoin(Book.author)
         .options(joinedload(Borrowing.book).joinedload(Book.author))
         .filter(Borrowing.user_id == user_id)
         .order_by(Borrowing.borrow_date.desc())
@@ -132,33 +134,21 @@ def get_user_borrowings(db: Session, user_id: int, page: int = 1, per_page: int 
     total = query.count()
     offset = (page - 1) * per_page
     borrowings = query.offset(offset).limit(per_page).all()
-
-    borrowings_data = []
-    for b in borrowings:
-        borrowings_data.append({
-            "id": b.id,
-            "book": {
-                "id": b.book.id,
-                "title": b.book.title,
-                "isbn": b.book.isbn,
-                "author": b.book.author.name if b.book.author else None,
-            } if b.book else None,
-            "borrow_date": str(b.borrow_date) if b.borrow_date else None,
-            "due_date": str(b.due_date) if b.due_date else None,
-            "return_date": str(b.return_date) if b.return_date else None,
-            "status": b.status,
-        })
+    borrowings_data = [b.to_dict() for b in borrowings]
 
     return paginated_response(borrowings_data, total, page, per_page, "Borrowing history retrieved")
 
 
 def get_all_borrowings(db: Session, page: int = 1, per_page: int = 10, status: str = None) -> dict:
     """
-    Retrieve all borrowing records across all users. Admin only.
+    Retrieve all borrowing records across all users using ORM joins. Admin only.
     Optionally filter by borrowing status.
     """
     query = (
         db.query(Borrowing)
+        .join(Borrowing.book)
+        .join(Borrowing.user)
+        .outerjoin(Book.author)
         .options(
             joinedload(Borrowing.book).joinedload(Book.author),
             joinedload(Borrowing.user),
@@ -172,27 +162,7 @@ def get_all_borrowings(db: Session, page: int = 1, per_page: int = 10, status: s
     total = query.count()
     offset = (page - 1) * per_page
     borrowings = query.offset(offset).limit(per_page).all()
-
-    borrowings_data = []
-    for b in borrowings:
-        borrowings_data.append({
-            "id": b.id,
-            "user": {
-                "id": b.user.id,
-                "full_name": b.user.full_name,
-                "email": b.user.email,
-            } if b.user else None,
-            "book": {
-                "id": b.book.id,
-                "title": b.book.title,
-                "isbn": b.book.isbn,
-                "author": b.book.author.name if b.book.author else None,
-            } if b.book else None,
-            "borrow_date": str(b.borrow_date) if b.borrow_date else None,
-            "due_date": str(b.due_date) if b.due_date else None,
-            "return_date": str(b.return_date) if b.return_date else None,
-            "status": b.status,
-        })
+    borrowings_data = [b.to_dict() for b in borrowings]
 
     return paginated_response(borrowings_data, total, page, per_page, "All borrowing records retrieved")
 
@@ -202,16 +172,5 @@ def get_all_users(db: Session) -> dict:
     Retrieve all registered users. Admin only.
     """
     users = db.query(User).all()
-    users_data = [
-        {
-            "id": u.id,
-            "full_name": u.full_name,
-            "email": u.email,
-            "phone": u.phone,
-            "is_admin": u.is_admin,
-            "is_active": u.is_active,
-            "created_at": str(u.created_at) if u.created_at else None,
-        }
-        for u in users
-    ]
+    users_data = [u.to_dict() for u in users]
     return success_response(users_data, "Users retrieved successfully")

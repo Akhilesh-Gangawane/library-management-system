@@ -20,5 +20,14 @@ class Category(Base):
     # Relationships
     books = relationship("Book", back_populates="category")
 
+    def to_dict(self) -> dict:
+        """Serialize category model to a maintainable dictionary / JSON format."""
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "created_at": str(self.created_at) if self.created_at else None,
+        }
+
     def __repr__(self):
         return f"<Category(id={self.id}, name='{self.name}')>"

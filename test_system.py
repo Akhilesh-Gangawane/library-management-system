@@ -100,23 +100,26 @@ def run_tests():
     assert res.json()["data"]["status"] == "returned"
     print("  [+] Return book OK")
 
+    import time
+    test_uid = str(int(time.time()))[-6:]
+
     # 7. Test Admin Operations
     # Add Author
-    res = client.post("/api/admin/authors", headers=admin_headers, json={"name": "Andrew S. Tanenbaum", "bio": "Author of Modern Operating Systems"})
+    res = client.post("/api/admin/authors", headers=admin_headers, json={"name": f"Andrew Tanenbaum {test_uid}", "bio": "Author of Modern Operating Systems"})
     assert res.status_code in (200, 201)
     author_id = res.json()["data"]["id"]
     print(f"  [+] Admin add author OK (author_id={author_id})")
 
     # Add Category
-    res = client.post("/api/admin/categories", headers=admin_headers, json={"name": "Operating Systems", "description": "OS kernel and design"})
+    res = client.post("/api/admin/categories", headers=admin_headers, json={"name": f"Operating Systems {test_uid}", "description": "OS kernel and design"})
     assert res.status_code in (200, 201)
     category_id = res.json()["data"]["id"]
     print(f"  [+] Admin add category OK (category_id={category_id})")
 
     # Add Book
     res = client.post("/api/admin/books", headers=admin_headers, json={
-        "title": "Modern Operating Systems",
-        "isbn": "9780133591620",
+        "title": f"Modern Operating Systems {test_uid}",
+        "isbn": f"978013{test_uid:0>7}",
         "description": "Comprehensive OS textbook",
         "publisher": "Pearson",
         "published_year": 2014,
