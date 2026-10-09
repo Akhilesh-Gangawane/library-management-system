@@ -53,13 +53,7 @@ def register_user(db: Session, full_name: str, email: str, password: str, phone:
         data={
             "access_token": token,
             "token_type": "bearer",
-            "user": {
-                "id": new_user.id,
-                "full_name": new_user.full_name,
-                "email": new_user.email,
-                "phone": new_user.phone,
-                "is_admin": new_user.is_admin,
-            },
+            "user": new_user.to_dict(),
         },
         message="Registration successful",
         status_code=201,
@@ -100,13 +94,7 @@ def login_user(db: Session, email: str, password: str) -> dict:
         data={
             "access_token": token,
             "token_type": "bearer",
-            "user": {
-                "id": user.id,
-                "full_name": user.full_name,
-                "email": user.email,
-                "phone": user.phone,
-                "is_admin": user.is_admin,
-            },
+            "user": user.to_dict(),
         },
         message="Login successful",
     )
@@ -122,15 +110,7 @@ def get_current_user_profile(db: Session, user_id: int) -> dict:
         return error_response("User not found", 404)
 
     return success_response(
-        data={
-            "id": user.id,
-            "full_name": user.full_name,
-            "email": user.email,
-            "phone": user.phone,
-            "is_admin": user.is_admin,
-            "is_active": user.is_active,
-            "created_at": str(user.created_at) if user.created_at else None,
-        },
+        data=user.to_dict(),
         message="Profile retrieved successfully",
     )
 
@@ -153,12 +133,6 @@ def update_user_profile(db: Session, user_id: int, full_name: str = None, phone:
     db.refresh(user)
 
     return success_response(
-        data={
-            "id": user.id,
-            "full_name": user.full_name,
-            "email": user.email,
-            "phone": user.phone,
-            "is_admin": user.is_admin,
-        },
+        data=user.to_dict(),
         message="Profile updated successfully",
     )

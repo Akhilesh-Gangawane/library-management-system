@@ -20,5 +20,14 @@ class Author(Base):
     # Relationships
     books = relationship("Book", back_populates="author")
 
+    def to_dict(self) -> dict:
+        """Serialize author model to a maintainable dictionary / JSON format."""
+        return {
+            "id": self.id,
+            "name": self.name,
+            "bio": self.bio,
+            "created_at": str(self.created_at) if self.created_at else None,
+        }
+
     def __repr__(self):
         return f"<Author(id={self.id}, name='{self.name}')>"

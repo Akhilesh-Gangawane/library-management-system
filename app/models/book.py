@@ -40,5 +40,34 @@ class Book(Base):
     category = relationship("Category", back_populates="books")
     borrowings = relationship("Borrowing", back_populates="book")
 
+    def to_dict(self, include_relations: bool = True) -> dict:
+        """Serialize book model to a maintainable dictionary / JSON format."""
+        data = {
+            "id": self.id,
+            "title": self.title,
+            "isbn": self.isbn,
+            "description": self.description,
+            "publisher": self.publisher,
+            "published_year": self.published_year,
+            "total_copies": self.total_copies,
+            "available_copies": self.available_copies,
+            "is_available": self.is_available,
+            "cover_image": self.cover_image,
+            "author_id": self.author_id,
+            "category_id": self.category_id,
+            "created_at": str(self.created_at) if self.created_at else None,
+            "updated_at": str(self.updated_at) if self.updated_at else None,
+        }
+        if include_relations:
+            data["author"] = {
+                "id": self.author.id,
+                "name": self.author.name,
+            } if self.author else None
+            data["category"] = {
+                "id": self.category.id,
+                "name": self.category.name,
+            } if self.category else None
+        return data
+
     def __repr__(self):
         return f"<Book(id={self.id}, title='{self.title}', isbn='{self.isbn}')>"

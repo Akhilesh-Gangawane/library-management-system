@@ -29,12 +29,17 @@ def get_all_books(
     Supports filtering by category, author, availability, and a text search
     across title, ISBN, and publisher fields.
     """
-    query = db.query(Book).options(
-        joinedload(Book.author),
-        joinedload(Book.category),
+    query = (
+        db.query(Book)
+        .outerjoin(Book.author)
+        .outerjoin(Book.category)
+        .options(
+            joinedload(Book.author),
+            joinedload(Book.category),
+        )
     )
 
-    # Apply search filter
+    # Apply search filter across book fields and joined author & category fields
     if search:
         search_term = f"%{search}%"
         query = query.filter(
@@ -42,6 +47,8 @@ def get_all_books(
                 Book.title.ilike(search_term),
                 Book.isbn.ilike(search_term),
                 Book.publisher.ilike(search_term),
+                Author.name.ilike(search_term),
+                Category.name.ilike(search_term),
             )
         )
 
@@ -64,37 +71,15 @@ def get_all_books(
     offset = (page - 1) * per_page
     books = query.offset(offset).limit(per_page).all()
 
-    # Serialize
-    books_data = []
-    for book in books:
-        books_data.append({
-            "id": book.id,
-            "title": book.title,
-            "isbn": book.isbn,
-            "description": book.description,
-            "publisher": book.publisher,
-            "published_year": book.published_year,
-            "total_copies": book.total_copies,
-            "available_copies": book.available_copies,
-            "is_available": book.is_available,
-            "cover_image": book.cover_image,
-            "author": {
-                "id": book.author.id,
-                "name": book.author.name,
-            } if book.author else None,
-            "category": {
-                "id": book.category.id,
-                "name": book.category.name,
-            } if book.category else None,
-            "created_at": str(book.created_at) if book.created_at else None,
-        })
+    # Maintainable JSON serialization via model mapper
+    books_data = [book.to_dict() for book in books]
 
     return paginated_response(books_data, total, page, per_page, "Books retrieved successfully")
 
 
 def get_book_by_id(db: Session, book_id: int) -> dict:
     """
-    Retrieve detailed information about a single book.
+    Retrieve detailed information about a single book using ORM join.
     """
     book = (
         db.query(Book)
@@ -106,32 +91,7 @@ def get_book_by_id(db: Session, book_id: int) -> dict:
     if not book:
         return error_response("Book not found", 404)
 
-    book_data = {
-        "id": book.id,
-        "title": book.title,
-        "isbn": book.isbn,
-        "description": book.description,
-        "publisher": book.publisher,
-        "published_year": book.published_year,
-        "total_copies": book.total_copies,
-        "available_copies": book.available_copies,
-        "is_available": book.is_available,
-        "cover_image": book.cover_image,
-        "author": {
-            "id": book.author.id,
-            "name": book.author.name,
-            "bio": book.author.bio,
-        } if book.author else None,
-        "category": {
-            "id": book.category.id,
-            "name": book.category.name,
-            "description": book.category.description,
-        } if book.category else None,
-        "created_at": str(book.created_at) if book.created_at else None,
-        "updated_at": str(book.updated_at) if book.updated_at else None,
-    }
-
-    return success_response(book_data, "Book retrieved successfully")
+    return success_response(book.to_dict(), "Book retrieved successfully")
 
 
 def create_book(db: Session, book_data: dict) -> dict:
@@ -288,10 +248,7 @@ def delete_book(db: Session, book_id: int) -> dict:
 def get_all_authors(db: Session) -> dict:
     """Retrieve all authors."""
     authors = db.query(Author).all()
-    authors_data = [
-        {"id": a.id, "name": a.name, "bio": a.bio, "created_at": str(a.created_at) if a.created_at else None}
-        for a in authors
-    ]
+    authors_data = [a.to_dict() for a in authors]
     return success_response(authors_data, "Authors retrieved successfully")
 
 
@@ -318,15 +275,7 @@ def create_author(db: Session, name: str, bio: str = None) -> dict:
 def get_all_categories(db: Session) -> dict:
     """Retrieve all categories."""
     categories = db.query(Category).all()
-    categories_data = [
-        {
-            "id": c.id,
-            "name": c.name,
-            "description": c.description,
-            "created_at": str(c.created_at) if c.created_at else None,
-        }
-        for c in categories
-    ]
+    categories_data = [c.to_dict() for c in categories]
     return success_response(categories_data, "Categories retrieved successfully")
 
 

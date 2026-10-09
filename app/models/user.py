@@ -29,5 +29,21 @@ class User(Base):
     # Relationships
     borrowings = relationship("Borrowing", back_populates="user")
 
+    def to_dict(self, include_private: bool = False) -> dict:
+        """Serialize user model to a maintainable dictionary / JSON format."""
+        data = {
+            "id": self.id,
+            "full_name": self.full_name,
+            "email": self.email,
+            "phone": self.phone,
+            "is_admin": self.is_admin,
+            "is_active": self.is_active,
+            "created_at": str(self.created_at) if self.created_at else None,
+            "updated_at": str(self.updated_at) if self.updated_at else None,
+        }
+        if include_private:
+            data["hashed_password"] = self.hashed_password
+        return data
+
     def __repr__(self):
         return f"<User(id={self.id}, email='{self.email}', is_admin={self.is_admin})>"
